@@ -9,6 +9,7 @@ import random
 from types import *
 import collections
 import alignmentFunctions as al
+import inputOutput as io
 
 BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
@@ -30,3 +31,16 @@ LABELS=list("-12")
 maskA="".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
 maskB="".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
 al.printMSAwithMask([seqA,seqB],[maskA,maskB])
+
+#let's do some multiple sequence alignment
+#first let's load sequences corresponding to melodies of the same tune family 
+sequences,ids=io.readFASTAandIDs("NotAligned/NLBproperSmall/Daar_ging_een_heer_1.fasta")
+
+print "Unaligned sequences:"
+al.printMSA(al.makeSameLength(sequences)) #ensure the sequences are of the same length first by adding gaps in the end
+
+#align them using MAFFT
+MSA=al.runMafftAlignmentWithSettings(sequences,2,1,method="globalpair",allowshift=False)
+print "Aligned sequences:"
+al.printMSA(MSA)
+	

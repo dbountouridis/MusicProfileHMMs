@@ -24,38 +24,13 @@ from scipy.interpolate import interp1d
 import collections
 from termcolor import colored
 import matrixFunctions as matrx
+import inputOutput as io
+
 
 
 BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
-#export sequences to FASTA format
-def exportGroupOfSequencesToFASTA(num_seq_MSA,output):
-	f = open(output, 'w')
-	f.close
-	f = open(output, 'a')
-	for i,seq in enumerate(num_seq_MSA):
-		f.write(">"+str(i)+"\n")
-		if type(seq)==ListType:
-			f.write("".join(seq))
-		if type(seq)==StringType or type(seq)==UnicodeType:
-			f.write(seq)
-		f.write("\n")
-	
-	f.close
 
-#export sequences to FASTA format with IDs
-def exportGroupOfSequencesToFASTAwithIDs(num_seq_MSA,ids,output):
-	f = open(output, 'w')
-	f.close
-	f = open(output, 'a')
-	for i,seq in enumerate(num_seq_MSA):
-		f.write(">"+ids[i]+"\n")
-		if type(seq)==ListType:
-			f.write("".join(seq))
-		if type(seq)==StringType or type(seq)==UnicodeType:
-			f.write(seq)
-		f.write("\n")
-	f.close
 
 #Generate a substitution matrix for pairwise alignment using an
 #array of groups of aligned sequences
@@ -71,7 +46,7 @@ def createMatrixFromGroupsOfSequences(groups,name="mymatrix"):
 		for i,sequence in enumerate(group): sequences[i]+=sequence.replace("-","*")
 		
 	#export to FASTA and compute LOM
-	exportGroupOfSequencesToFasta(sequences,"temp/full1.fasta")
+	io.exportGroupOfSequencesToFASTA(sequences,"temp/full1.fasta")
 	LOM=matrx.createScoreMatrixFromAlignment("temp/full1.fasta","mylearned-"+name+".matrix")
 	
 	#normalize the LOM cells
@@ -102,10 +77,10 @@ def interpolateResample(vector,size):
 #Add gaps to the end of sequences in an MSA so that they are of the same length
 def makeSameLength(sequences):
 	#maximum sequence length in 
-	maxl=np.max([len(sequences[i] for i in range(0,len(sequences)) )])
+	maxl=np.max([len(sequences[i]) for i in range(0,len(sequences)) ])
 
 	#add gaps
-	S=[sequences[i]+"-"*(maxl-len(sequences[i])) for i in range(0,len(sequences))]
+	S=["".join(sequences[i])+"-"*(maxl-len(sequences[i])) for i in range(0,len(sequences))]
 	return S
 
 #Naive key estimation of a chord sequence
@@ -163,8 +138,8 @@ def findKey(sequence,knownkey=False):
 def MSAdistance(msa1,msa2):
 	tempfilein1="temp/dis_msa1.fasta"
 	tempfilein2="temp/dis_msa2.fasta"
-	exportGroupOfSequencesToFasta(msa1,tempfilein1)
-	exportGroupOfSequencesToFasta(msa2,tempfilein2)
+	io.exportGroupOfSequencesToFASTA(msa1,tempfilein1)
+	io.exportGroupOfSequencesToFASTA(msa2,tempfilein2)
 	command="./metal "+tempfilein1+" "+tempfilein2+" >temp/metal_dis.txt"
 	os.system(command)
 	txt=readTxtFile("temp/metal_dis.txt")
@@ -175,8 +150,8 @@ def MSAdistance(msa1,msa2):
 def MSAsimilaritySOP(msa1,msa2):
 	tempfilein1="temp/dis_msa1.fasta"
 	tempfilein2="temp/dis_msa2.fasta"
-	exportGroupOfSequencesToFasta(msa1,tempfilein1)
-	exportGroupOfSequencesToFasta(msa2,tempfilein2)
+	io.exportGroupOfSequencesToFASTA(msa1,tempfilein1)
+	io.exportGroupOfSequencesToFASTA(msa2,tempfilein2)
 	command="./t_coffee -other_pg aln_compare -al1 "+tempfilein1+" -al2 "+tempfilein2+"  >temp/tcoffee_dis.txt"
 	os.system(command)
 	txt=readTxtFile("temp/tcoffee_dis.txt")
@@ -214,7 +189,7 @@ def innerMetricAnalysis(onset_vector,type="metrical"):
 
 #compute the naive concensus sequence from an alignment of sequences
 def consensusFromSequencesCnf(sequences,threshold,ambiguous,require_multiple):
-	exportGroupOfSequencesToFasta(sequences,"temp/forconsensus.fasta")
+	io.exportGroupOfSequencesToFASTA(sequences,"temp/forconsensus.fasta")
 	c_align = AlignIO.read("temp/forconsensus.fasta", "fasta")
 	summary_align = AlignInfo.SummaryInfo(c_align)
 	concensus=summary_align.dumb_consensus(threshold=threshold, ambiguous=ambiguous, consensus_alpha=None, require_multiple=require_multiple)
@@ -225,13 +200,13 @@ def runMafftAlignmentWithSettings(inputSequences,gap_open,gap_ext,method="global
 	tempfile="temp/tempseq.fasta"
 	tempfileout="temp/tempmsa.fasta"
 	tempfileout2="temp/tempmsa2.fasta"
-	exportGroupOfSequencesToFasta(inputSequences,tempfile)
+	io.exportGroupOfSequencesToFASTA(inputSequences,tempfile)
 	if allowshift==True:
 		command="mafft-mac/mafft.bat --quiet --op "+str(gap_open)+" --ep "+str(gap_ext)+" --"+method+" --maxiterate 1000 --allowshift  --text "+tempfile+"		> "+tempfileout2
 	else:
 		command="mafft-mac/mafft.bat --quiet --op "+str(gap_open)+" --ep "+str(gap_ext)+" --"+method+" --maxiterate 1000   --text "+tempfile+"		> "+tempfileout2
 	os.system(command)
-	output=readFASTA(tempfileout2)
+	output=io.readFASTA(tempfileout2)
 	return output
 
 #run MAFFT alignment on a group of sequences with a substitution matrix
@@ -239,10 +214,10 @@ def runMafftAlignmentWithMatrix(inputSequences,gap_open,gap_ext,method="globalpa
 	tempfile="temp/tempseq.fasta"
 	tempfileout="temp/tempmsa.fasta"
 	tempfileout2="temp/tempmsa2.fasta"
-	exportGroupOfSequencesToFasta(inputSequences,tempfile)
+	io.exportGroupOfSequencesToFASTA(inputSequences,tempfile)
 	command="mafft-mac/mafft.bat --quiet  --op "+str(gap_open)+" --ep "+str(gap_ext)+" --"+method+" --maxiterate 1000 --aamatrix "+matrixfile+" "+tempfile+"		> "+tempfileout2
 	os.system(command)
-	output=readFASTA(tempfileout2)
+	output=io.readFASTA(tempfileout2)
 	return output
 
 #compute the consensus sequence from an MSA using the data fusion technique
