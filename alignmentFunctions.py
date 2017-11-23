@@ -6,7 +6,6 @@ import time
 import re
 import json
 import pylev
-import math
 import numpy as np
 from random import shuffle
 import csv
@@ -19,16 +18,15 @@ from Bio import AlignIO
 from Bio import Alphabet
 from Bio.Alphabet import IUPAC
 from Bio.Align import AlignInfo
-import math
 import random
 from types import *
 from scipy.interpolate import interp1d
 import collections
 from termcolor import colored
-import matrix as matrx
+import matrixFunctions as matrx
 
 
-BIOALPHABET="ARNDCQEGHILKMFPSTWYVBZX".split() #Protein alphabet
+BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
 #export sequences to FASTA format
 def exportGroupOfSequencesToFASTA(num_seq_MSA,output):
@@ -294,31 +292,36 @@ def pairwiseBetweenSequencesWithMatrix(seqA, seqB, gapopen=-0.8, gapext=-0.5, ma
 	        return score,winAli
 
 #pairwise alignment between two sequences with input gap settings match mismatch values  
-def pairwiseBetweenSequences(seqA,seqB, match=1,mismatch=-1,gapopen=-0.8,gapext=-0.5,type_="global"):
+def pairwiseBetweenSequences(seqA,seqB, match=1,mismatch=-1,gapopen=-0.8,gapext=-0.5,type_="global",returnAlignment=False):
 	maxscore=-1000000
 	if type_=="global":
-		return pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext,score_only=True)
-		for a in pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext):
-			score=a[2]
-			if score>maxscore:
-				winSeq=seqB
-				maxscore=score
-				winAli=a
-			break
+		if not returnAlignment:
+			return pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext,score_only=True),False
+		else:
+			for a in pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext):
+				score=a[2]
+				if score>maxscore:
+					winSeq=seqB
+					maxscore=score
+					winAli=a
+				break
+			return score,winAli
 	if type_=="local":
-		return pairwise2.align.localms(seqA, seqB, match,mismatch,gapopen,gapext,score_only=True)
-		for a in pairwise2.align.localms(seqA, seqB, match,mismatch,gapopen,gapext):
-			score=a[2]
-			if score>maxscore:
-				winSeq=seqB
-				maxscore=score
-				winAli=a
-			break
-	return maxscore,winAli
+		if not returnAlignment:
+			return pairwise2.align.localms(seqA, seqB, match,mismatch,gapopen,gapext,score_only=True),False
+		else:
+			for a in pairwise2.align.localms(seqA, seqB, match,mismatch,gapopen,gapext):
+				score=a[2]
+				if score>maxscore:
+					winSeq=seqB
+					maxscore=score
+					winAli=a
+				break
+			return score,winAli
 
 #Print a multiple sequence alignment with mask (corresponding to patten labels 0,1,2) on the terminal
 def printMSAwithMask(MSA,mask):
-    Alphabet="123456789".split()
+    Alphabet=list("123456789")
 
     #create the palette of possible foreground background combinations
     col1=[("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
@@ -369,7 +372,7 @@ def printMSAmask(MSA):
 
 #Print an MSA on the terminal
 def printMSA(MSA):
-    Alphabet="-ARNDCQEGHILKMFPSTWYVBZX12345678*".split()
+    Alphabet=list("-ARNDCQEGHILKMFPSTWYVBZX12345678*")
 
     #create the palette of possible foreground background combinations
     col1=[("grey",[]),("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
