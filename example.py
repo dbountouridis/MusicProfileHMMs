@@ -10,6 +10,7 @@ from types import *
 import collections
 import alignmentFunctions as al
 import inputOutput as io
+import kroghProfileHMM as krogh
 
 BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
@@ -46,5 +47,39 @@ al.printMSA(MSA)
 
 #Read MIDI file
 Notes,Durations,Onsets,minduration,PitchIntervals=io.readMIDIfile("AM-13A-2.mid")
+
+#Create a Krogh profile HMM from a folk tune family
+#First we need the emission probabilities gathered from the whole dataset
+directory="NotAligned/NLBproperSmall"
+files=io.filesInPath(directory)
+allPossibleSymbols="".join(["".join(["".join(seq) for seq in io.readFASTA(directory+"/"+file)]) for file in files]).replace("-","")
+counts=collections.Counter(allPossibleSymbols) #count
+alphabet=[symbol for symbol in counts] #all possible symbols
+counts=np.array([counts[symbol] for symbol in counts]) #corresponding counts
+EmissionProbabilities = dict(zip(alphabet, counts/np.sum(counts) )) #convert to dictionary
+
+#Bake the Krogh profile HMM model
+sw=10
+pct=1
+pec=1/12.
+grms=0.95
+model,columnsIsMatchState=krogh.profileHMM(MSA,alphabet=alphabet,gapRatiotoMatchStates=grms,pseudoCountTransition=pct,sequenceWeight=sw,pseudoEmissionCount=pec,plot_=False,uniformInsertionProbs=True,nullEmission=EmissionProbabilities)
+
+#Train it on the MSA to readjust the HMM parameters
+multiplication=10
+di=0.5
+ei=0.5
+s_th=0.000001
+model.train([sequence for sequence in MSA],max_iterations=500,distribution_inertia=di, edge_inertia=ei,stop_threshold=s_th,algorithm='baum-welocalh')
+
+#Compare sequences to the profile HMM
+
+
+	
+
+
+
+
+
 
 	

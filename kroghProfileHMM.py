@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import pylab
 from graphviz import Digraph
 
-BIOALPHABET="ARNDCQEGHILKMFPSTWYVBZX".split() #Protein alphabet
+BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
 #plot a profile-HMM based on its structure using graphviz
 def plotHMM(edges,match_ids,delete_ids,insert_ids,matchEmissionProbs,sequences):
@@ -126,7 +126,7 @@ def computeProfHMMStructurefromAlignment(sequences,Alphabet=BIOALPHABET,gapRatio
 	blueprint=[]
 	matchEmissionProbs=[]
 	for i in range(L):
-		column=np.array([sequences[j][i] for j in range(ns): column.append()])
+		column=np.array([sequences[j][i] for j in range(ns)])
 
 		#most frequent symbol per column ratio 
 		most_frequent_ratio=collections.Counter(column[np.where(column!="-")]).most_common(1)[0][1]/len(column)
