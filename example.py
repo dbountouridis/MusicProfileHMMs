@@ -43,4 +43,8 @@ al.printMSA(al.makeSameLength(sequences)) #ensure the sequences are of the same 
 MSA=al.runMafftAlignmentWithSettings(sequences,2,1,method="globalpair",allowshift=False)
 print "Aligned sequences:"
 al.printMSA(MSA)
+
+#Read MIDI file
+Notes,Durations,Onsets,minduration,PitchIntervals=io.readMIDIfile("AM-13A-2.mid")
+
 	
