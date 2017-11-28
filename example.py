@@ -11,6 +11,7 @@ import collections
 import alignmentFunctions as al
 import inputOutput as io
 import kroghProfileHMM as krogh
+from sklearn.metrics import average_precision_score
 
 BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
 
@@ -27,7 +28,7 @@ alignment=[alignment_info[0],alignment_info[1]]
 al.printMSA(alignment)
 print "Alignment score:",score
 
-#let's add some annotations on the original sequences and visualize them on the terminal
+#add some annotations on the original sequences and visualize them on the terminal
 LABELS=list("-12")
 maskA="".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
 maskB="".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
@@ -72,7 +73,14 @@ ei=0.5
 s_th=0.000001
 model.train([sequence for sequence in MSA],max_iterations=500,distribution_inertia=di, edge_inertia=ei,stop_threshold=s_th,algorithm='baum-welocalh')
 
-#Compare sequences to the profile HMM
+#Compare sequences of a random family plus a sequence from the original MSA to the profile HMM
+familyIndex=int(random.random()*len(files))
+querySequences=["".join(seq).replace("-","") for seq in io.readFASTA(directory+"/"+files[familyIndex])]+["".join(MSA[0])]
+queryIds=[files[familyIndex]]*(len(querySequences)-1)+["Daar_ging_een_heer_1.fasta"]
+
+scores=[krogh.compareSequenceToProfHMM(model,query)[0] for query in querySequences]
+labels=["Daar_ging_een_heer_1.fasta"==filename for filename in queryIds]
+print "Average precision:",average_precision_score(labels,scores)
 
 
 	
