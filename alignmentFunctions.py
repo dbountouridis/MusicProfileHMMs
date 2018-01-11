@@ -8,6 +8,7 @@ import json
 import pylev
 import numpy as np
 from random import shuffle
+import matplotlib.pyplot as plt
 import csv
 import math
 import string
@@ -25,6 +26,8 @@ import collections
 from termcolor import colored
 import matrixFunctions as matrx
 import inputOutput as io
+import matplotlib.gridspec as gridspec
+from matplotlib.colors import LinearSegmentedColormap
 
 
 
@@ -416,3 +419,83 @@ def plotOneAlignmentWithMask(sequences,mask,output,blackAndWhite=False):
     plt.savefig(output,format="pdf")
     plt.close()
 
+#plot alignment with our without stability histogram
+def plotAlignmentWithNaiveStability(sequences,output,labels=False):
+    Alphabet=BIOALPHABET[:]
+
+    Alphabet=list(set([s for s in np.array(sequences).flatten()]))
+    Alphabet.pop(Alphabet.index("-"))
+    shuffle(Alphabet)
+    print Alphabet
+
+
+ 
+    #convert to image
+    image=np.zeros((len(sequences),len(sequences[0])))
+    x=0
+    for sequence in sequences:
+        y=0
+        for s in sequence:
+            if s=="-": image[x][y]=0
+            else:
+                image[x][y]=Alphabet.index(s)+1
+            y+=1
+        x+=1
+	fig = plt.figure(figsize=(15, 8))
+	gs1 = gridspec.GridSpec(4, 4)
+	gs1.update( hspace=0.00,wspace=0.00)
+	axes0 = plt.subplot(gs1[:-1, :])
+	axes1 = plt.subplot(gs1[-1, :])
+
+	colors_ = [(256,256,256),(32,185,171),(194,156,21),(25,147,136),(8,120,115),(0,105,101),(0,60,72),(249,115,6),(252,90,80),(233,187,25)]  # R -> G -> B
+  	C=[]
+  	for c in colors_+colors_[1:]:
+  		r,g,b=c
+  		C.append((r/256.0,g/256.0,b/256.0))
+  	
+  	
+    cm = LinearSegmentedColormap.from_list("mycmap", C, N=len(C))
+
+
+    conf_arr = image
+    axes0.set_aspect(1)
+    axes0.imshow(image, cmap=cm, interpolation='nearest')
+    width = len(conf_arr)
+    height = len(conf_arr[0])
+    for x in xrange(width):
+        for y in xrange(height):
+            axes0.annotate(sequences[x][y], xy=(y, x), 
+                        horizontalalignment='center',
+                        verticalalignment='center',size=10,color="white")
+    axes0.axis('off')
+    s=np.array(sequences).flatten()
+    for i,text in enumerate(axes0.texts):
+        if s[i]=="-":text.set_color("black")
+       
+    # The second axis is the "stability"
+	axes1.bar(range(0,len(sequences[0])), mostFrequentSymbolPerColumn(sequences),color='gray',width=1.0,linewidth=0)
+	axes1.set_xlim([0,len(sequences[0])])
+    #plt.savefig(output,format="pdf")
+    axes1.spines['right'].set_visible(False)
+    axes1.spines['top'].set_visible(False)
+    axes1.spines['bottom'].set_visible(False)
+
+    plt.show()
+    plt.close()
+
+#compute the frequency of the most frequence symbol per column in an MSA
+def mostFrequentSymbolPerColumn(MSA):
+	numOfsequences=len(MSA)
+	lengthOfMSA=len(MSA[0])
+	a=np.array(MSA)
+	
+	ratios=[]
+	for i in xrange(lengthOfMSA):
+		column=a[:,i]
+		gapless=column[np.where(column!="-")]
+		counts=collections.Counter(column[np.where(column!="-")])
+		#percentageOfgaps.append(len(np.where(column=="-")[0])/numOfsequences)
+		mx=np.max([counts[char] for char in counts])
+		ratio=mx/numOfsequences
+		ratios.append(ratio)
+	return ratios

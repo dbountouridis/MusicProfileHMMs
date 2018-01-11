@@ -8,6 +8,7 @@ from random import shuffle
 import math
 from types import *
 import string
+import inputOutput as io
 
 #global
 hmmer_folder="HMMER/binaries-"
@@ -19,7 +20,7 @@ hmmer_correctLabel="!CORRECT!"
 
 #jackhmmer search
 def hmmJackSearch(query,id,targetFasta,toReturn,dataset="3"):
-	fun.exportGroupOfSequencesToFASTAwithIDs([query],[id],"temp/jackhmmerinput.fasta")
+	io.exportGroupOfSequencesToFASTAwithIDs([query],[id],"temp/jackhmmerinput.fasta")
 	c_line=hmmer_folder+dataset+"/jackhmmer  -N 3 --fragthresh 1   --wnone --enone  --plaplace  --mxfile 'id.matrix' --max  --noali --domZ "+str(toReturn)+" -Z "+str(toReturn)+"  --tblout temp/jackhmmer.out  'temp/jackhmmerinput.fasta' "+targetFasta +" >temp/verbose.txt"
 	os.system(c_line)
 	rank=readHMMsearchOutput("temp/jackhmmer.out")
@@ -33,7 +34,7 @@ def hmmSearch(id,targetFasta,toReturn,dataset="3"):
 	return rank
 
 def hmmScan(sequence,id,toReturn=1000,dataset="3"):
-	fun.exportGroupOfSequencesToFASTAwithIDs([sequence],[id],"temp/hmmscaninput.fasta")
+	io.exportGroupOfSequencesToFASTAwithIDs([sequence],[id],"temp/hmmscaninput.fasta")
 	c_line=hmmer_folder+dataset+"/hmmscan --max -E 1e+20000000 --domE 1e+20000000  --nonull2 --noali --domZ "+str(toReturn)+" --tblout temp/hmmscan.out  '"+hmmer_databases+"/database' temp/hmmscaninput.fasta"+" >temp/verbose.txt"
 	os.system(c_line)
 	rank=readHMMsearchOutput("temp/hmmscan.out")
@@ -58,7 +59,7 @@ def readHMMsearchOutput(file):
 
 #build hmmer profile from folder
 def createHMMprofiles(folder,threshold,subfolder,dataset):
-	cliques=fun.filesInPath(folder)
+	cliques=io.filesInPath(folder)
 	for clique in cliques:
 		input_file='"'+folder+'/'+clique+'"'
 		c_line=hmmer_folder+dataset+'/hmmbuild --fragthresh 1 --symfrac '+str(threshold)+hmmer_options+' "'+hmmer_profiles+'/'+subfolder+'/'+clique+'.hmm" '+input_file
@@ -77,7 +78,7 @@ def createHMMDatabase(dataset="3"):
 	os.system("rm -Rf "+hmmer_databases+"/database.h3p")
 	print "Concatenating..."
 	c_line="cat "
-	cliques=fun.filesInPath(hmmer_profiles)
+	cliques=io.filesInPath(hmmer_profiles)
 	for clique in cliques:
 		c_line=c_line+' "'+hmmer_profiles+"/"+clique+'" '
 	c_line=c_line+' > "'+hmmer_databases+'/database"'
@@ -94,7 +95,7 @@ def createHMMDatabase(dataset="3"):
 #build hmmer profile from alignment
 def createHMMprofileFromAlignment(alignment,name,dataset="3"):
 	os.system("rm -Rf "+hmmer_profiles+"/"+name+'.hmm') #delete previous correct hmm
-	fun.exportGroupOfSequencesToFasta(alignment,"temp/"+name+".fasta")
+	io.exportGroupOfSequencesToFASTA(alignment,"temp/"+name+".fasta")
 	input_file="temp/"+name+".fasta"
 	c_line=hmmer_folder+dataset+'/hmmbuild -o hmm.out  --symfrac '+str(hmmer_threshold)+hmmer_options+' "'+hmmer_profiles+'/'+name+'.hmm" '+input_file
 	os.system(c_line)

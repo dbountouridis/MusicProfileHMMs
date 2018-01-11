@@ -1,0 +1,35 @@
+#                                                                                         --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name                                 accession  query name            accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#                         ------------------- ----------  -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+Wat_zag_ik_daar_van_verre_1.fasta             -          Heer_Halewijn_4.fasta -                7.8   -2.9   0.0        17   -4.0   0.0   1.1   1   0   0   1   1   1   1 -
+Heer_Halewijn_4.fasta                         -          Heer_Halewijn_4.fasta -                7.9   -2.6   0.0        13   -3.3   0.0   1.1   1   0   0   1   1   1   1 -
+Een_Soudaan_had_een_dochtertje_1.fasta        -          Heer_Halewijn_4.fasta -                8.8   -3.2   0.0        14   -3.9   0.0   1.1   1   0   0   1   1   1   1 -
+Zolang_de_boom_zal_bloeien_1.fasta            -          Heer_Halewijn_4.fasta -                9.2   -2.8   0.0        15   -3.6   0.0   1.1   1   0   0   1   1   1   1 -
+Vaarwel_bruidje_schoon.fasta                  -          Heer_Halewijn_4.fasta -                9.4   -3.7   0.0        14   -4.3   0.0   1.1   1   1   0   1   1   1   1 -
+Kom_laat_ons_nu_zo_stil_niet_zijn_1.fasta     -          Heer_Halewijn_4.fasta -                9.5   -3.9   0.0        16   -4.6   0.0   1.0   1   0   0   1   1   1   1 -
+Er_was_een_herderinnetje_1.fasta              -          Heer_Halewijn_4.fasta -                9.8   -4.2   0.0        18   -5.1   0.0   1.0   1   0   0   1   1   1   1 -
+Er_reed_er_eens_een_ruiter_1.fasta            -          Heer_Halewijn_4.fasta -                9.8   -3.2   0.0        20   -4.2   0.0   1.1   1   0   0   1   1   1   1 -
+Het_was_laatst_op_een_zomerdag.fasta          -          Heer_Halewijn_4.fasta -                 10   -3.0   0.0        20   -3.9   0.0   1.1   1   1   0   1   1   1   1 -
+Er_woonde_een_vrouwtje_al_over_het_bos.fasta  -          Heer_Halewijn_4.fasta -                 10   -4.0   0.0        19   -4.9   0.0   1.0   1   0   0   1   1   1   1 -
+Lieve_schipper_vaar_me_over_1.fasta           -          Heer_Halewijn_4.fasta -                 10   -3.2   0.0        23   -4.4   0.0   1.1   1   0   0   1   1   1   1 -
+Het_was_op_een_driekoningenavond_1.fasta      -          Heer_Halewijn_4.fasta -                 11   -3.5   0.0        21   -4.5   0.0   1.1   1   1   0   1   1   1   1 -
+Daar_ging_een_heer_1.fasta                    -          Heer_Halewijn_4.fasta -                 11   -3.2   0.0        25   -4.4   0.0   1.1   1   0   0   1   1   1   1 -
+O_God_ik_leef_in_nood.fasta                   -          Heer_Halewijn_4.fasta -                 11   -4.2   0.0        20   -5.1   0.0   1.0   1   0   0   1   1   1   1 -
+Er_was_een_koopman_rijk_en_machtig.fasta      -          Heer_Halewijn_4.fasta -                 11   -3.5   0.0        24   -4.6   0.0   1.1   1   0   0   1   1   1   1 -
+Femmes_voulez_vous_eprouver.fasta             -          Heer_Halewijn_4.fasta -                 11   -4.2   0.0        24   -5.2   0.0   1.0   1   0   0   1   1   1   1 -
+Ik_kwam_laatst_eens_in_de_stad.fasta          -          Heer_Halewijn_4.fasta -                 11   -2.9   0.0        26   -4.3   0.0   1.1   1   0   0   1   1   1   1 -
+Heer_Halewijn_2.fasta                         -          Heer_Halewijn_4.fasta -                 12   -3.2   0.0        23   -4.2   0.0   1.1   1   0   0   1   1   1   1 -
+Daar_reed_een_jonkheer_1.fasta                -          Heer_Halewijn_4.fasta -                 12   -3.5   0.0        25   -4.6   0.0   1.1   1   0   0   1   1   1   1 -
+Daar_zou_er_een_maagdje_vroeg_opstaan_2.fasta -          Heer_Halewijn_4.fasta -                 12   -4.1   0.0        26   -5.3   0.0   1.0   1   0   0   1   1   1   1 -
+Het_vrouwtje_van_Stavoren_1.fasta             -          Heer_Halewijn_4.fasta -                 13   -4.3   0.0        26   -5.5   0.0   1.0   1   0   0   1   1   1   1 -
+Daar_was_laatstmaal_een_ruiter_2.fasta        -          Heer_Halewijn_4.fasta -                 15   -4.0   0.0        26   -5.5   0.0   1.1   1   0   0   1   1   1   1 -
+#
+# Program:         hmmscan
+# Version:         3.1b2 (February 2015)
+# Pipeline mode:   SCAN
+# Query file:      temp/hmmscaninput.fasta
+# Target file:     HMMER/databases/database
+# Option settings: HMMER/binaries-NLBproperSmall/hmmscan --tblout temp/hmmscan.out --noali -E 1e+20000000 --domE 1e+20000000 --max --nonull2 --domZ 1000 HMMER/databases/database temp/hmmscaninput.fasta 
+# Current dir:     /Users/dimitrios/Documents/Code/GitBasics/MusicProfileHMMs
+# Date:            Tue Dec  5 16:28:26 2017
+# [ok]

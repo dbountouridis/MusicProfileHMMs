@@ -1,0 +1,19 @@
+# hmmbuild :: profile HMM construction from multiple sequence alignments
+# HMMER 3.1b2 (February 2015); http://hmmer.org/
+# Copyright (C) 2015 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# input alignment file:             temp/Heer_Halewijn_4.fasta.fasta
+# output HMM file:                  HMMER/profiles/Heer_Halewijn_4.fasta.hmm
+# output directed to file:          hmm.out
+# sym fraction for model structure: 0.000
+# relative weighting scheme:        none
+# effective seq number scheme:      none
+# prior scheme:                     Laplace +1
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# idx name                  nseq  alen  mlen eff_nseq re/pos description
+#---- -------------------- ----- ----- ----- -------- ------ -----------
+1     Heer_Halewijn_4.fasta    11    32    32    11.00    inf 
+
+# CPU time: 0.01u 0.00s 00:00:00.01 Elapsed: 00:00:00.01

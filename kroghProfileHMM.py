@@ -307,10 +307,10 @@ def createProfileHMMfromStructure(profHMM,matchEmissionProbs,match_ids,insert_id
 
 #create a profile HMM based on an alignment of sequences on an alphabet
 def profileHMM(alignment,alphabet=BIOALPHABET,gapRatiotoMatchStates=0.2,pseudoCountTransition=1,sequenceWeight=10,pseudoEmissionCount=1,plot_=False,uniformInsertionProbs=True,nullEmission=[]):
-	print "Create structure..."
+	#print "Create structure..."
 	profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,blueprint=computeProfHMMStructurefromAlignment(alignment,alphabet,gapRatiotoMatchStates,pseudoCountTransition,sequenceWeight,pseudoEmissionCount,plot_)
 
-	print "Bake profile HMM model..."
+	#print "Bake profile HMM model..."
 	model=createProfileHMMfromStructure(profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,alphabet,uniformInsertionProbs,nullEmission)
 	return model,blueprint
 
