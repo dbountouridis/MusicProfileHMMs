@@ -37,3 +37,8 @@ al.printMSA(MSA)
 
 ```
 
+###### Citation
+If you use any part of the code, please cite the following publication:
+
+Bountouridis, D., Brown, D.G., Wiering, F. and Veltkamp, R.C.	Melodic Similarity and Applications Using Biologically-Inspired Techniques. Appl. Sci. 2017, 7, 1242.
+
