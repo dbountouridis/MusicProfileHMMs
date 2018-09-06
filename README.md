@@ -4,13 +4,20 @@ Python routines for multiple sequence alignment, generating profile HMMs, focuse
 These are my standard set of routines for data-driven analysis of unidimensional music sequences. They contain functions for pairwise alignment (based on BioPython), multiple sequence alignment (using MAFFT or progressive alignment with T-COFFEE), substitution matrix creation from alignments (based on BioPython), consensus generation from an MSA (majority voting, or data fusion), profile HMM modelling of an MSA using Krogh's original model (1994) and HMMER.
 
 ##### Example usage
+
+Create two random 20-symbol sequences from the protein alphabet:
+
 ```
-#create two random sequences from the protein alphabet
 seqA="".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 seqB="".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 
-#globally align them
+```
+
+Globally pairwise align them
+
+```
 score,alignment_info=al.pairwiseBetweenSequences(seqA,seqB, match=1,mismatch=-1,gapopen=-0.8,gapext=-0.5,type_="global",returnAlignment=True)
+```
 
 #Beautifully showing the alignment on the terminal
 alignment=[alignment_info[0],alignment_info[1]]
