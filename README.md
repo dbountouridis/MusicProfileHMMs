@@ -8,8 +8,8 @@ These are my standard set of routines for data-driven analysis of unidimensional
 We start with a simple example of protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
 
 ```
-seqA="".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
-seqB="".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
+seqA = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
+seqB = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 
 ```
 
