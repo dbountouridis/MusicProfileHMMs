@@ -1,59 +1,90 @@
+""" A collection of functions related profile HMMs. 
+
+The collection includes building an HMM model, training it
+visualizing it and so on. The HMM strategy correspond to the
+simple Krogh model.
+
+Example:
+	See example.py
+
+Todo:
+	* Convert these functions into a class
+
+"""
+
 from __future__ import division
-from yahmm import *
-import time
+
 import collections
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
 import pylab
+import time
+
 from graphviz import Digraph
+from yahmm import *
 
-BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX") #Protein alphabet
+__author__ = 'Dimitrios  Bountouridis'
 
-#plot a profile-HMM based on its structure using graphviz
-def plotHMM(edges,match_ids,delete_ids,insert_ids,matchEmissionProbs,sequences):
-	g = Digraph('G', filename='cluster.gv',format="pdf",engine="dot")
+# Protein alphabet
+BIOALPHABET=list("ARNDCQEGHILKMFPSTWYVBZX")
+
+def plotHMM(edges, match_ids, delete_ids, insert_ids, matchEmissionProbs, sequences):
+	""" Plot a profile-HMM based on its structure using graphviz.
+
+	There's not guarantee that the ouput would be visualy informative for
+	HMMs with many states.
+
+	Args:
+		edges (dict): edge weights between states
+		match_ids (list): list of ids that would correspond match states
+		delete_ids (list): list of ids that would correspond delete states
+		insert_ids (list): list of ids that would correspond insert states
+		matchEmissionProbs (dict): dictionary of the form {state_id:{symbol:float,symbolB: float}}
+		sequences (array): the multiple sequence alignment to be shown next to the HMM
+
+	"""
+
+	g = Digraph('G', filename='cluster.gv', format="pdf", engine="dot")
 
 	c0 = Digraph('cluster_0')
 	c0.body.append('style=filled')
 	c0.body.append('color=white')
 	c0.attr('node', shape='box')
-	c0.node_attr.update(color='orange', style='filled')
-	match_ids_without_StartEnd=match_ids[:]
-	index=match_ids.index("Global Sequence Aligner-end")
+	c0.node_attr.update(color = 'orange', style='filled')
+	match_ids_without_StartEnd = match_ids[:]
+	
+	index = match_ids.index("Global Sequence Aligner-end")
 	match_ids_without_StartEnd.pop(index)
-	index=match_ids.index("Global Sequence Aligner-start")
+	
+	index = match_ids.index("Global Sequence Aligner-start")
 	match_ids_without_StartEnd.pop(index)
-	for match_id in match_ids:
-		c0.node(match_id)
+	for match_id in match_ids: c0.node(match_id)
 
 	c1 = Digraph('cluster_1')
 	c1.body.append('style=filled')
 	c1.body.append('color=white')
-	c1.attr('node', shape='doubleoctagon')
-	c1.node_attr.update(color="orange",penwidth="1")
-	for insert_id in insert_ids:
-		c1.node(insert_id)
+	c1.attr('node', shape = 'doubleoctagon')
+	c1.node_attr.update(color = "orange",penwidth="1")
+	for insert_id in insert_ids: c1.node(insert_id)
 	c1.edge_attr.update(color='white')
-	for i in range(len(insert_ids)-1):
-		c1.edge(insert_ids[i], insert_ids[i+1])	
+	for i in range(len(insert_ids)-1):c1.edge(insert_ids[i], insert_ids[i+1])	
 
 	c2 = Digraph('cluster_2')
 	c2.body.append('style=filled')
 	c2.body.append('color=white')
-	c2.attr('node', shape='circle')
-	c2.node_attr.update(color="orange",penwidth="2")
-	for  delete_id in delete_ids:
-		c2.node(delete_id)
+	c2.attr('node', shape = 'circle')
+	c2.node_attr.update(color = "orange",penwidth = "2")
+	for delete_id in delete_ids: c2.node(delete_id)
 
 	c3 = Digraph('cluster_3')
 	c3.body.append('style=filled')
 	c3.body.append('color=white')
 	c3.attr('node', shape='box')
 	c3.node_attr.update(color='white', style='filled',fontsize="14")
-	mIds=[]
+	mIds = []
 	for i, match in enumerate(matchEmissionProbs):
-		s=match_ids_without_StartEnd[i]
+		s = match_ids_without_StartEnd[i]
 		for j,symbol in enumerate(match):
 			if match[symbol]>0.05: s+= "%s"%symbol+"   %.2f"%match[symbol]+"\n"
 		mIds.append(s)
@@ -74,46 +105,33 @@ def plotHMM(edges,match_ids,delete_ids,insert_ids,matchEmissionProbs,sequences):
 
 	g.node('Global Sequence Aligner-start', shape='box')
 	g.node('Global Sequence Aligner-end', shape='box')
-	g.edge_attr.update( arrowsize='0.5')
+	g.edge_attr.update( arrowsize = '0.5')
 	g.body.extend(['rankdir=LR', 'size="160,100"'])
 	g.view()
 
-#a simpler profile-HMM plotter
-def plotHMMsimple(profHMM,match_ids,delete_ids,insert_ids):
-	G = nx.DiGraph()
-	for state1 in profHMM:
-		for state2 in profHMM[state1]:
-			G.add_edges_from([(state1,state2)], weight=profHMM[state1][state2])
-	edge_labels=dict([((u,v,),"%.2f"%d['weight']) for u,v,d in G.edges(data=True)])
-	edge_colors = ['black' for edge in G.edges()]
-	values =[]
-	labels={}
-	i=0
-	for node in G.nodes():
-	 if node in match_ids: 	values.append(0.5)
-	 if node in insert_ids: values.append(0.2)
-	 if node in delete_ids: values.append(0)
-	 i+=1
-	pos=nx.circular_layout(G)
-	pos={}
-	for id in match_ids:
-		if id not in ["model.star","model.end"]:
-			pos.update({id:np.array([1+match_ids.index(id),0])})
-		if id=="model.start":
-			pos.update({id:np.array([-1,2])})
-		if id=="model.end":
-			pos.update({id:np.array([1+match_ids.index(id)+1,2])})
-	for id in delete_ids:
-		pos.update({id:np.array([1.5+delete_ids.index(id),4])})
-	for id in insert_ids:
-		pos.update({id:np.array([1+insert_ids.index(id),2])})
-	nx.draw_networkx_labels(G,pos,font_size=12)
-	nx.draw_networkx_edge_labels(G,pos,edge_labels=edge_labels,font_size=12)
-	nx.draw(G,pos,node_color = values, node_size=1000,edge_color=edge_colors,edge_cmap=plt.cm.Reds)
-	plt.show()
+def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRatiotoMatchStates=0.4, pseudoCountTransition=1, sequenceWeight=10, pseudoEmissionCount=1, plot=False):
+	""" Create profile HMM structure from aligned sequences.
+	
+	Args:
+		sequences (array): array of aligned sequences
+		Alphabet (list): the alphabet of the HMM
+		gapRatiotoMatchStates (float): the gap ratio under which a column becomes a match state
+		pseudoCountTransition (float): pseudocount for each state transition
+		sequenceWeight (int): the weight places on the MSA (this controls the effect of pseudocounts)
+		pseudoEmissionCount (int): the pseudocount for the emission probabibilies
+		plot (bool): whether to plot or not
+	
+	Returns:
+		profHMM (dict): the profile HMM transition structure e.g. {statei:{statej:float,statek:float}}
+		matchEmissionProbs (array):
+		match_ids
+		insert_ids
+		delete_ids
+		blueprint
 
-#return the following structures based on an alignment: one (profHMM) containing the state transition probabilities and the other one (matchEmissionProbs) the emission probabilities of each match state. Also match states, insertion, detele state ids
-def computeProfHMMStructurefromAlignment(sequences,Alphabet=BIOALPHABET,gapRatiotoMatchStates=0.4,pseudoCountTransition=1,sequenceWeight=10,pseudoEmissionCount=1,plot=False):
+
+	"""
+
 	L=len(sequences[0])
 	ns=len(sequences)
 

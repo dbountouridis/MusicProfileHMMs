@@ -7,7 +7,7 @@ Example:
 	See example.py
 
 Todo:
-	* 
+	* Convert these functions into an alignment class
 
 """
 
@@ -308,17 +308,17 @@ def pairwiseBetweenSequences(seqA, seqB, match=1, mismatch=-1, gapopen=-0.8, gap
 		param2 (): either the alignment or False
 
 	"""
-	maxscore=-1000000
+	maxscore = -1000000
 	if type_=="global":
 		if not returnAlignment:
 			return pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext,score_only=True),False
 		else:
 			for a in pairwise2.align.globalms(seqA, seqB, match,mismatch,gapopen,gapext):
-				score=a[2]
+				score = a[2]
 				if score>maxscore:
-					winSeq=seqB
-					maxscore=score
-					winAli=a
+					winSeq = seqB
+					maxscore = score
+					winAli = a
 				break
 			return score,winAli
 	if type_=="local":
@@ -405,53 +405,3 @@ def printMSA(MSA):
             else:text+=colored(c,CL[0],CL[1])
         print text
    
-#seaborn heatmap of multiple sequence alignment with mask
-def plotOneAlignmentWithMask(sequences,mask,output,blackAndWhite=False):
-    map1=["-","1","2","3","4","5","6","7","8","9"]
-    size=len(sequences)
-    length=len(sequences[0])
-    M = np.zeros((size,length))
-    for i, seq in enumerate(mask):
-        for j in range(length):
-            M[i][j] = map1.index(seq[j])
-    corr = pd.DataFrame(M,  columns=range(length))
-    sns.set_context("notebook", font_scale=0.8, rc={"lines.linewidth": 1.0})
-    sns.set_style({'font.family': 'serif', 'font.serif': ['Times New Roman']})
-
-    # Set up the matplotlib figure
-    _, ax = plt.subplots(figsize=(15,15*size/length))
-    cmap=sns.light_palette((210, 90, 60), input="husl")
-    flatui = ["#ffffff", "#a2cffe","#3498db", "#95a5a6", "#e74c3c", "#34495e", "#2ecc71"]
-    cmap=sns.cubehelix_palette(dark=0.3, light=1, as_cmap=True,rot=.1)
-    sns.heatmap(corr,cbar=False,  ax=ax, annot=True,fmt=".1f",linewidths=.5,cmap=cmap)
-
-    ALPHA=["-"+BIOALPHABET]
-
-    s=np.array(sequences).flatten()
-    for i,text in enumerate(ax.texts):
-        if i<len(s):
-            if s[i]!="-":text.set_text(s[i])
-            else: text.set_text(" ")
-            text.set_size(8)
-            text.set_weight('bold')
-    plt.savefig(output,format="pdf")
-    plt.close()
-
-
-
-#compute the frequency of the most frequence symbol per column in an MSA
-def mostFrequentSymbolPerColumn(MSA):
-	numOfsequences=len(MSA)
-	lengthOfMSA=len(MSA[0])
-	a=np.array(MSA)
-	
-	ratios=[]
-	for i in xrange(lengthOfMSA):
-		column=a[:,i]
-		gapless=column[np.where(column!="-")]
-		counts=collections.Counter(column[np.where(column!="-")])
-		#percentageOfgaps.append(len(np.where(column=="-")[0])/numOfsequences)
-		mx=np.max([counts[char] for char in counts])
-		ratio=mx/numOfsequences
-		ratios.append(ratio)
-	return ratios
