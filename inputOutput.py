@@ -1,24 +1,40 @@
+""" A collection of reading/writing file functions. 
+
+The collection includes reading (and/or) writing MIDI
+FASTA, json and other file formats.
+
+Example:
+	See example.py
+
+Todo:
+	* Convert these functions into a class object
+
+"""
 from __future__ import division
-import os
-from os import listdir
-from os.path import isfile, isdir, join
-import time
-import re
+
+import collections
 import json
 import math
+import midi
 import numpy as np
+import os
+import re
 import string
-from Bio import SeqIO
-from Bio import pairwise2
-from Bio.pairwise2 import format_alignment
+import time
+
 from Bio import AlignIO
 from Bio import Alphabet
-from Bio.Alphabet import IUPAC
+from Bio import SeqIO
+from Bio import pairwise2
 from Bio.Align import AlignInfo
-from types import *
-import collections
+from Bio.Alphabet import IUPAC
+from Bio.pairwise2 import format_alignment
+from os import listdir
+from os.path import isdir
+from os.path import isfile
+from os.path import join
 from termcolor import colored
-import midi
+from types import *
 
 
 #MIDI read
