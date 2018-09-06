@@ -1,14 +1,14 @@
 """ A collection of functions related profile HMMs. 
 
-The collection includes building an HMM model, training it
-visualizing it and so on. The HMM strategy correspond to the
-simple Krogh model.
+The collection includes building an HMM model
+visualizing it and so on. The HMM architecture
+corresponds to the simple Krogh model.
 
 Example:
 	See example.py
 
 Todo:
-	* Convert these functions into a class
+	* Convert these functions into a class object
 
 """
 
@@ -109,8 +109,11 @@ def plotHMM(edges, match_ids, delete_ids, insert_ids, matchEmissionProbs, sequen
 	g.body.extend(['rankdir=LR', 'size="160,100"'])
 	g.view()
 
-def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRatiotoMatchStates=0.4, pseudoCountTransition=1, sequenceWeight=10, pseudoEmissionCount=1, plot=False):
+def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRatiotoMatchStates=0.4, 
+	pseudoCountTransition=1, sequenceWeight=10, pseudoEmissionCount=1, plot=False):
 	""" Create profile HMM structure from aligned sequences.
+
+	This function is the first step towards building a working profile HMM.
 	
 	Args:
 		sequences (array): array of aligned sequences
@@ -123,58 +126,58 @@ def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRat
 	
 	Returns:
 		profHMM (dict): the profile HMM transition structure e.g. {statei:{statej:float,statek:float}}
-		matchEmissionProbs (array):
-		match_ids
-		insert_ids
-		delete_ids
-		blueprint
+		matchEmissionProbs (array): dictionary of the form {state_id:{symbol:float,symbolB: float}}
+		match_ids (array): list of ids that should correspond to match states
+		insert_ids (array): list of ids that should correspond to insert states
+		delete_ids (array): list of ids that should correspond to delete states
+		blueprint (array): a bool array with ones for the columns that should become match states
 
 
 	"""
 
-	L=len(sequences[0])
-	ns=len(sequences)
+	L = len(sequences[0])
+	ns = len(sequences)
 
-	#Emission prob template with psuedo emission counts
-	alphabet_distribution={}
+	# Emission prob template with psuedo emission counts
+	alphabet_distribution = {}
 	for char in Alphabet: alphabet_distribution.update({char:pseudoEmissionCount})
 
-	#compute which columns will become match states, emission probs per state
-	#the blueprint is a vector that helps us create the profHMM later
-	blueprint=[]
-	matchEmissionProbs=[]
+	# Compute which columns will become match states, emission probs per state
+	# The blueprint is a vector that helps us create the profHMM later
+	blueprint = []
+	matchEmissionProbs = []
 	for i in range(L):
-		column=np.array([sequences[j][i] for j in range(ns)])
+		column = np.array([sequences[j][i] for j in range(ns)])
 
-		#most frequent symbol per column ratio 
-		most_frequent_ratio=collections.Counter(column[np.where(column!="-")]).most_common(1)[0][1]/len(column)
+		# Most frequent symbol per column ratio 
+		most_frequent_ratio = collections.Counter(column[np.where(column!="-")]).most_common(1)[0][1]/len(column)
 	
-		number_of_gaps=np.where(column=="-")[0].shape[0]
-		gap_ratio=number_of_gaps/len(column)
-		if gap_ratio>=gapRatiotoMatchStates :# #this is an insert state
+		number_of_gaps = np.where(column=="-")[0].shape[0]
+		gap_ratio = number_of_gaps/len(column)
+		if gap_ratio>=gapRatiotoMatchStates:  # This is an insert state
 			blueprint.append(1) 
-		else:   #this is a match state. We compute the emission probs
+		else:   # This is a match state. We compute the emission probs
 			blueprint.append(0)
 			newMatchEmissionProbs=alphabet_distribution.copy()
-			counts=collections.Counter(column)
+			counts = collections.Counter(column)
 			for char in counts:
-				if char!="-": newMatchEmissionProbs[char]+=counts[char]*sequenceWeight #important formula
-			#convert to probs
+				if char!="-": newMatchEmissionProbs[char]+=counts[char]*sequenceWeight  # Important formula
+			# Convert to probs
 			sum=0
 			for char in newMatchEmissionProbs: sum+=newMatchEmissionProbs[char]
 			for char in newMatchEmissionProbs: newMatchEmissionProbs[char]=newMatchEmissionProbs[char]/sum
 			matchEmissionProbs.append(newMatchEmissionProbs)
-	blueprint=np.array(blueprint) #we have our blueprint
+	blueprint = np.array(blueprint) 
 	
-	#generate initial structure
-	numberOfMatchStates=np.where(blueprint==0)[0].shape[0]+2 #plus begin end
-	numberOfDeleteStates=np.where(blueprint==0)[0].shape[0]+2 
-	numberOfInsertStates=np.where(blueprint==0)[0].shape[0]+2
-	pseudo=pseudoCountTransition #the pseudo count added to every transition between states
-	weight=sequenceWeight #the weight of each sequence in terms of counts
+	# Generate initial structure
+	numberOfMatchStates = np.where(blueprint==0)[0].shape[0]+2  # Plus begin end states
+	numberOfDeleteStates = np.where(blueprint==0)[0].shape[0]+2 
+	numberOfInsertStates = np.where(blueprint==0)[0].shape[0]+2
+	pseudo = pseudoCountTransition  # The pseudo count added to every transition between states
+	weight = sequenceWeight  # The weight of each sequence in terms of counts
 
-	#create structure of states
-	profHMM={} #the most important structure of the function. holds the transition probs
+	# Create structure of states
+	profHMM={}  # The most important structure of the function. Holds the transition probs
 	match_ids=[]
 	insert_ids=[]
 	delete_ids=[]
@@ -189,24 +192,24 @@ def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRat
 		profHMM.update({"I"+str(i):{}})
 		insert_ids.append("I"+str(i))
 
-	#assign transition probabilities
+	# Assign transition probabilities
 	for i in range(0,numberOfInsertStates-1):
 		profHMM[insert_ids[i]].update({match_ids[i+1]:pseudo,insert_ids[i]:pseudo,delete_ids[i+1]:pseudo})
-	#Delete states
+	# Delete states
 	for i in range(0,numberOfDeleteStates-1):
 		profHMM[delete_ids[i]].update({match_ids[i+1]:pseudo, delete_ids[i+1]:pseudo,insert_ids[i]:pseudo})
-	#match states
+	# Match states
 	for i in range(0,numberOfMatchStates-1):
 		profHMM[match_ids[i]].update({match_ids[i+1]:0, delete_ids[i+1]:pseudo,insert_ids[i]:pseudo})
 
-	#compute path on hmm for each sequence and update state transition counts
+	# Compute path on hmm for each sequence and update state transition counts
 	for sequence in sequences:
-		sequence=np.array(list(sequence))
+		sequence = np.array(list(sequence))
 		gap_blueprint=np.where(sequence=="-")[0]
-		gp=np.zeros(len(blueprint))
-		gp[gap_blueprint]=1
-		path=["M0"]
-		count=0
+		gp = np.zeros(len(blueprint))
+		gp[gap_blueprint] = 1
+		path = ["M0"]
+		count = 0
 		for i in range(len(blueprint)):
 		 	if gp[i]==0 and blueprint[i]==0: 
 		 		count+=1
@@ -214,14 +217,14 @@ def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRat
 		 	if gp[i]==1 and blueprint[i]==0: 
 		 		count+=1
 		 		path.append("D"+str(count)) 		
-		 	if gp[i]==1 and blueprint[i]==1: nothing=1#path.append("d")
+		 	if gp[i]==1 and blueprint[i]==1: nothing = 1  #path.append("d")
 		 	if gp[i]==0 and blueprint[i]==1: path.append("I"+str(count))
 		path.append(match_ids[-1])
 		for i in range(len(path)-1):profHMM[path[i]][path[i+1]]+=weight
 
 	profHMM[match_ids[0]].update( {delete_ids[1]:0,insert_ids[0]:0})
 
-	#delete first and last deletion states
+	# Delete first and last deletion states
 	todel=[]
 	for state1 in profHMM:
 		for state2 in profHMM[state1]:
@@ -235,11 +238,11 @@ def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRat
 	delete_ids.pop(-1)
 	delete_ids.pop(0)
 
-	#delete last insertion state
+	# Delete last insertion state
 	del profHMM[insert_ids[-1]]
 	insert_ids.pop(-1)
 
-	#change names of first and last match states
+	# Change names of first and last match states
 	todel=[]
 	for state1 in profHMM:
 		for state2 in profHMM[state1]:
@@ -249,66 +252,85 @@ def computeProfHMMStructurefromAlignment(sequences, Alphabet=BIOALPHABET, gapRat
 		if state1==match_ids[-1]:todel.append([state1])
 	for m in todel:
 		if len(m)==2:
-			temp=profHMM[m[0]][m[1]]
+			temp = profHMM[m[0]][m[1]]
 			del profHMM[m[0]][m[1]]
 			if m[1]==match_ids[0]:profHMM[m[0]].update({"model.start":temp})	
 			if m[1]==match_ids[-1]:profHMM[m[0]].update({"model.end":temp})		
 		if len(m)==1: 
-			temp=profHMM[m[0]]
+			temp = profHMM[m[0]]
 			del profHMM[m[0]]
 			if m[0]==match_ids[0]:profHMM.update({"model.start":temp})	
 			if m[0]==match_ids[-1]:profHMM.update({"model.end":temp})	
 	match_ids[0]="model.start"
 	match_ids[-1]="model.end"
 
-	#Convert counts to probs
+	# Convert counts to probs
 	for state1 in profHMM:
-		sum=0
+		sum = 0
 		for state2 in profHMM[state1]: sum+=profHMM[state1][state2]
 		if sum!=0:
-			for state2 in profHMM[state1]: profHMM[state1][state2]=profHMM[state1][state2]/sum
+			for state2 in profHMM[state1]: profHMM[state1][state2] = profHMM[state1][state2]/sum
 		else:
-		 	for state2 in profHMM[state1]: profHMM[state1][state2]=0.5 #to agree with matlab
+		 	for state2 in profHMM[state1]: profHMM[state1][state2] = 0.5  # To agree with matlab implementation
 	return profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,blueprint
 
-#bake a profile HMM model from the structures created by computeProfHMMStructurefromAlignment
-def createProfileHMMfromStructure(profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,Alphabet=BIOALPHABET,uniformInsertionProbs=True,nullEmission=[]):
+def createProfileHMMfromStructure(profHMM, matchEmissionProbs, match_ids, insert_ids, delete_ids, 
+	Alphabet=BIOALPHABET, uniformInsertionProbs = True, nullEmission = []):
+	""" Bake a profile HMM model from the structures created by computeProfHMMStructurefromAlignment
+
+	The function computeProfHMMStructurefromAlignment generates the profile HMM's overall structure.
+	The current function takes that structure and creates an actual yahmm model.
+
+	Args:
+		profHMM (dict): the profile HMM transition structure e.g. {statei:{statej:float,statek:float}}
+		matchEmissionProbs (array): dictionary of the form {state_id:{symbol:float,symbolB: float}}
+		match_ids (array): list of ids that should correspond to match states
+		insert_ids (array): list of ids that should correspond to insert states
+		delete_ids (array): list of ids that should correspond to delete states
+		Alphabet (list): the alphabet of the HMM
+		uniformInsertionProbs (bool): if true the insert state symbol probs are drawn from a uniform distribution
+		nullEmission (dict): the insert state symbol probs for non uniform distribution
+
+	Returns:
+		model (yahmm object): the yahmm profile HMM model
+
+	
+	"""
+
 	model = Model( name="Global Sequence Aligner" )
 	
-	#compute the symbol distribution for insertion emissions
+	# Compute the symbol distribution for insertion emissions
 	if uniformInsertionProbs:
-		probOfChar=1/len(Alphabet)
-		distribution={}
+		probOfChar = 1/len(Alphabet)
+		distribution = {}
 		for char in Alphabet: distribution.update({char:probOfChar})
 		i_d = DiscreteDistribution( distribution )
-	else:
-		i_d = DiscreteDistribution( nullEmission )
+	else: i_d = DiscreteDistribution( nullEmission )
 
-
-	#create the insert states, each with a uniform insertion distribution
-	I=[]
-	S={}
+	# Create the insert states, each with a uniform insertion distribution
+	I = []
+	S = {}
 	for insert_id in insert_ids:
 		i0 = State( i_d, name=insert_id )
 		S.update({insert_id:i0})
 
-	#create the match states with small chances of mismatches
+	# Create the match states with small chances of mismatches
 	match_ids_without_StartEnd=match_ids[:]
 	match_ids_without_StartEnd.pop(-1)
 	match_ids_without_StartEnd.pop(0)
 	for match_id in match_ids_without_StartEnd:
-		index=match_ids_without_StartEnd.index(match_id)
-		emissionProb=matchEmissionProbs[index]
+		index = match_ids_without_StartEnd.index(match_id)
+		emissionProb = matchEmissionProbs[index]
 		m1 = State( DiscreteDistribution(emissionProb) , name=match_id )
 		S.update({match_id:m1})
 	
-	#create the silent delete states
+	# Create the silent delete states
 	D=[]
 	for delete_id in delete_ids:
 		d1 = State( None, name=delete_id )
 		S.update({delete_id:d1})
 
-	#add all the states to the model
+	# Add all the states to the model
 	model.add_states([S[i] for i in S])
 
 	for state1 in profHMM:
@@ -323,19 +345,58 @@ def createProfileHMMfromStructure(profHMM,matchEmissionProbs,match_ids,insert_id
 	model.bake()
 	return model
 
-#create a profile HMM based on an alignment of sequences on an alphabet
-def profileHMM(alignment,alphabet=BIOALPHABET,gapRatiotoMatchStates=0.2,pseudoCountTransition=1,sequenceWeight=10,pseudoEmissionCount=1,plot_=False,uniformInsertionProbs=True,nullEmission=[]):
-	#print "Create structure..."
-	profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,blueprint=computeProfHMMStructurefromAlignment(alignment,alphabet,gapRatiotoMatchStates,pseudoCountTransition,sequenceWeight,pseudoEmissionCount,plot_)
+
+def profileHMM(alignment, alphabet = BIOALPHABET, gapRatiotoMatchStates = 0.2, pseudoCountTransition = 1,
+	sequenceWeight = 10, pseudoEmissionCount = 1, plot_ = False, uniformInsertionProbs = True,nullEmission=[]):
+	""" Create a profile HMM based on an alignment of sequences on an alphabet.
+
+	This is wrapper function that firsts computes the structure of the profile HMM and then
+	creates a yahmm object (profile HMM) from that structure. In reality it calls two functions
+	as follows: computeProfHMMStructurefromAlignment and createProfileHMMfromStructure.
+
+	Args:
+		alignment (array): array of aligned sequences
+		alphabet (list): the context's alphabet (e.g. BIOALPHABET for protein sequences)
+		gapRatiotoMatchStates (float): the gap ratio under which a column becomes a match state
+		pseudoCountTransition (float): pseudocount for each state transition
+		sequenceWeight (int): the weight places on the MSA (this controls the effect of pseudocounts)
+		pseudoEmissionCount (int): the pseudocount for the emission probabibilies
+		plot_ (bool): whether to plot or not
+		uniformInsertionProbs (bool): if true the insert state symbol probs are drawn from a uniform distribution
+		nullEmission (dict): the insert state symbol probs for non uniform distribution
+
+	Returns:
+		model (yahmm object): the yahmm profile HMM model
+		blueprint (array): a bool array with ones for the columns that should become match states
+
+	
+	"""
+
+	
+	profHMM, matchEmissionProbs, match_ids, insert_ids, delete_ids, blueprint = computeProfHMMStructurefromAlignment(alignment,
+		alphabet, gapRatiotoMatchStates, pseudoCountTransition, sequenceWeight, pseudoEmissionCount, plot_)
 
 	#print "Bake profile HMM model..."
-	model=createProfileHMMfromStructure(profHMM,matchEmissionProbs,match_ids,insert_ids,delete_ids,alphabet,uniformInsertionProbs,nullEmission)
+	model = createProfileHMMfromStructure(profHMM, matchEmissionProbs, match_ids, insert_ids, delete_ids, alphabet, 
+		uniformInsertionProbs, nullEmission)
+	
 	return model,blueprint
 
-#compare a single sequence to a profile HMM using viterbi decoding
 def compareSequenceToProfHMM(model,sequence):
+	""" Compare a single sequence to a profile HMM using viterbi decoding
+
+	Args:
+		model (yahmm object): a trained yahmm profile HMM model
+		sequence (str): the sequence to be compared
+
+	Returns:
+		logp (float): the comparison score
+		path (vector): the resulting HMM path
+
+	"""
+
 	logp, path = model.viterbi( list(sequence.replace("-","")) )
-	return logp,path
+	return logp, path
 
 
     
