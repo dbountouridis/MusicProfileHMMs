@@ -1,22 +1,25 @@
 from __future__ import division
+
 import matplotlib
 import matplotlib.pyplot as plt
-from os import listdir
-from os.path import isfile, join
-import os
-import random
 import numpy as np
 import operator
-from Bio import AlignIO
-from Bio import Alphabet
-from Bio.Alphabet import IUPAC
-from Bio.Align import AlignInfo
-from Bio import SubsMat
+import os
 import pickle
-from types import *
+import random
 import string
 
-BIOALPHABET="ARNDCQEGHILKMFPSTWYVBZX".split() #Protein alphabet
+from Bio import AlignIO
+from Bio import Alphabet
+from Bio import SubsMat
+from Bio.Align import AlignInfo
+from Bio.Alphabet import IUPAC
+from os import listdir
+from os.path import isfile
+from os.path import join
+from types import *
+
+BIOALPHABET = "ARNDCQEGHILKMFPSTWYVBZX".split() #Protein alphabet
 
 #generate a substitution matrix from a fasta input file
 def createScoreMatrixFromAlignment(filename,output,print_=False):

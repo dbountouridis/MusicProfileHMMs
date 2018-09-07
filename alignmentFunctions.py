@@ -20,7 +20,6 @@ import json
 import math
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-import matrixFunctions as matrx
 import numpy as np
 import os
 import pylev
@@ -80,7 +79,7 @@ def createMatrixFromGroupsOfSequences(groups, name="mymatrix"):
 		
 	# Export to FASTA and compute LOM
 	io.exportGroupOfSequencesToFASTA(sequences,"temp/full1.fasta")
-	LOM = matrx.createScoreMatrixFromAlignment("temp/full1.fasta","mylearned-"+name+".matrix")
+	LOM = createScoreMatrixFromAlignment("temp/full1.fasta","mylearned-"+name+".matrix")
 	
 	# Normalize LOM 
 	X = [LOM[tuple] for tuple in LOM]
@@ -89,14 +88,14 @@ def createMatrixFromGroupsOfSequences(groups, name="mymatrix"):
 
 	# Convert LOM to a matrix dictionary and a T-COFFEE matrix
 	matrix = {}
-	MATRIX = np.zeros((23,23))-9
+	MATRIX = np.zeros((lent(BIOALPHABET),len(BIOALPHABET)))-9
 	for tuple in LOM:
 		matrix.update({tuple:LOM[tuple] })
-		MATRIX[A.index(tuple[0]),A.index(tuple[1])] = ((LOM[tuple]-mX)/stdX)*9
+		MATRIX[BIOALPHABET.index(tuple[0]), BIOALPHABET.index(tuple[1])] = ((LOM[tuple]-mX)/stdX)*9
 
 	# Export
 	pickle.dump(matrix,open("mylearned-"+name+".pickle","wb" ) )
-	matrx.tcoffeeMakeMatrix(MATRIX,A,"mylearned-"+name+".matrix",-9)
+	tcoffeeMakeMatrix(MATRIX,"mylearned-"+name+".matrix",-9)
 	
 def makeSameLength(sequences):
 	""" Add gaps to the end of sequences so that they are of the same length.
@@ -471,3 +470,67 @@ def tcoffeeAlignmentWithMatrix(sequences,go,ge,matrixfile):
 	os.system(command)
 	output = io.readFASTA("temp/tcoffee-out.fasta")
 	return output
+
+def createScoreMatrixFromAlignment(filename, output):
+	""" Generate substitution matrix from a file containing alignment
+
+	Args:
+		filename (str): path to a fasta file containing aligned sequences
+		output (str): path to a pickle file for the matrix to be stored
+
+	Returns:
+		my_lom (array): log odds matrix
+
+
+	"""
+
+	c_align = AlignIO.read(filename, "fasta")
+	summary_align = AlignInfo.SummaryInfo(c_align)
+	replace_info = summary_align.replacement_dictionary(["*"])
+	my_arm = SubsMat.SeqMat(replace_info)
+	
+	# Add pseudocounts
+	for m in my_arm:
+		my_arm[m]+=1
+	my_lom = SubsMat.make_log_odds_matrix(my_arm)
+	
+	pickle.dump( my_lom, open( output, "wb" ) )
+	return my_lom
+
+def tcoffeeMakeMatrix(M, output, tc_mismatch):
+	""" Convert a numpy array corresponding to a substitution matrix to T-COFFEE format
+
+	T-COFFEE needs a integer-based matrix in a special formatting
+
+	Args:
+		M (array): numpy substitution matrix
+		output (str): path to file for saving the matrix
+		tc_mismatch (int): default mismatch penalty 
+
+
+	"""
+	
+	alpha = BIOALPHABET[:]
+	string = "   "
+	for i in range(0,len(alpha)-1):	
+		string = string + alpha[i]+"  "
+	string = string + alpha[i+1]+"  *\n"
+	
+	r = range(0,len(M))
+	for i in r:
+		string = string+alpha[r.index(i)]
+		for j in r:
+			val = str(int(round(max([M[i][j],-20])))) 
+			if len(val)==1: string = string+"  "+val+""
+			if len(val)==2: string = string+" "+val+""
+			if len(val)==3: string = string+" "+val+""
+		string = string+" "+str(tc_mismatch)+" \n"
+	string = string+"*"
+	
+	for i in r:
+		string = string+" "+str(tc_mismatch)+""
+	string = string+" "+str(tc_mismatch)
+
+	fo = open(output, "w")
+	fo.write(string)
+	fo.close()
