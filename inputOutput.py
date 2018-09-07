@@ -36,7 +36,7 @@ from os.path import join
 from termcolor import colored
 from types import *
 
-__author__  =  'Dimitrios  Bountouridis'
+__author__ = 'Dimitrios  Bountouridis'
 
 def readMIDIfile(file):
 	""" Read midi file.
@@ -71,7 +71,7 @@ def readMIDIfile(file):
 	return Notes, Durations, Onsets, minduration, PitchIntervals
 
 def readMIDItype1(file):
-	pattern  =  midi.read_midifile(file)
+	pattern = midi.read_midifile(file)
 	resolution = pattern._EventStream__resolution
 	events = pattern.trackpool
 	# We assume a 4 channel MIDI file
@@ -102,7 +102,7 @@ def readMIDItype1(file):
 	return Notes,Durations,Onsets,minduration,resolution
 
 def readMIDItype2(file):
-	pattern  =  midi.read_midifile(file)
+	pattern = midi.read_midifile(file)
 	events = pattern.trackpool
 
 	#We assume a 4 channel MIDI file
@@ -139,29 +139,29 @@ def readMIDItype2(file):
 	return Notes,Durations,Onsets,minduration,_
 
 def readTxtFile(file):
-	f  =  open(file, 'r')
+	f = open(file, 'r')
 	text = f.read()
 	f.close()
 	return text
 
 def filesInPath(mypath,ext = []):
 	if len(ext) == 0:
-		onlyfiles  =  [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" ]
+		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" ]
 	else :
-		onlyfiles  =  [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" and f[-len(ext):] == ext]
+		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" and f[-len(ext):] == ext]
 	return onlyfiles
 
 def dirsInPath(mypath):
 	return [ f for f in listdir(mypath) if isdir(join(mypath,f)) ]
 	
 def writeTxtFile(file,string):
-	f  =  open(file, 'w')
+	f = open(file, 'w')
 	f.write(string)
 	f.close()
 
 def readJsonFile(file):
 	with open(file) as data_file:
-		data  =  json.load(data_file)
+		data = json.load(data_file)
 	return data
 
 def readFASTA(file):
@@ -176,9 +176,9 @@ def readFASTAandIDs(file):
 	return newS,ids
 
 def exportGroupOfSequencesToFASTA(num_seq_MSA,output):
-	f  =  open(output, 'w')
+	f = open(output, 'w')
 	f.close
-	f  =  open(output, 'a')
+	f = open(output, 'a')
 	for i,seq in enumerate(num_seq_MSA):
 		f.write(">"+str(i)+"\n")
 		if type(seq) == ListType:
@@ -186,13 +186,12 @@ def exportGroupOfSequencesToFASTA(num_seq_MSA,output):
 		if type(seq) == StringType or type(seq) == UnicodeType:
 			f.write(seq)
 		f.write("\n")
-	
 	f.close
 
 def exportGroupOfSequencesToFASTAwithIDs(num_seq_MSA,ids,output):
-	f  =  open(output, 'w')
+	f = open(output, 'w')
 	f.close
-	f  =  open(output, 'a')
+	f = open(output, 'a')
 	for i,seq in enumerate(num_seq_MSA):
 		f.write(">"+ids[i]+"\n")
 		if type(seq) == ListType:

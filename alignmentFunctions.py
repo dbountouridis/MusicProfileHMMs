@@ -1,7 +1,7 @@
 """ A collection of functions for alignment-related tasks. 
 
 The collection includes generating substitution matrices from alignments,
-computing the distance between MSAs, computing MSAs and so on.
+computing the distance between MSAs, computing MSAs (using MAFFT, T-COFFEE) and so on.
 
 Example:
 	See example.py
@@ -404,4 +404,70 @@ def printMSA(MSA):
             if len(CL[1])<1:text+=colored(c,CL[0])
             else:text+=colored(c,CL[0],CL[1])
         print text
-   
+
+
+def tcoffeeAlignment(sequences,go,ge):
+	""" The standard T-COFFEE alignment.
+
+	For more info: http://www.tcoffee.org/Projects/tcoffee/#DOCUMENTATION
+	
+	Args:
+		sequences (array): array of strings to be aligned
+		go (int): gap open penalty
+		ge (int): gap extent penalty
+
+	Returns:
+		output (array): aligned sequences
+
+
+	"""
+
+	io.exportGroupOfSequencesToFasta(sequences,"temp/tcoffee-in.fasta")
+	command = "./t_coffee 'temp/tcoffee-in.fasta' -quiet -output fasta -outfile 'temp/tcoffee-out.fasta'"
+	os.system(command)
+	output = io.readFASTA("temp/tcoffee-out.fasta")
+	return output
+
+def tcoffeeAlignmentWithID(sequences,go,ge):
+	""" The standard T-COFFEE alignment with ID matrix (ones in the diagonal)
+
+	For more info: http://www.tcoffee.org/Projects/tcoffee/#DOCUMENTATION
+	
+	Args:
+		sequences (array): array of strings to be aligned
+		go (int): gap open penalty
+		ge (int): gap extent penalty
+
+	Returns:
+		output (array): aligned sequences
+
+
+	"""
+
+	io.exportGroupOfSequencesToFasta(sequences,"temp/tcoffee-in.fasta")
+	command = "./t_coffee 'temp/tcoffee-in.fasta' -matrix ID  -gapopen = "+str(go)+" -gapext = "+str(ge)+" -quiet -output fasta -outfile 'temp/tcoffee-out.fasta'"
+	os.system(command)
+	output = io.readFASTA("temp/tcoffee-out.fasta")
+	return output
+
+def tcoffeeAlignmentWithMatrix(sequences,go,ge,matrixfile):
+	""" The standard T-COFFEE alignment with custom matrix 
+
+	For more info: http://www.tcoffee.org/Projects/tcoffee/#DOCUMENTATION
+	
+	Args:
+		sequences (array): array of strings to be aligned
+		go (int): gap open penalty
+		ge (int): gap extent penalty
+		matrixfile (str): file path to an appropriate matrix file
+
+	Returns:
+		output (array): aligned sequences
+
+	"""
+
+	io.exportGroupOfSequencesToFasta(sequences,"temp/tcoffee-in.fasta")
+	command = "./t_coffee 'temp/tcoffee-in.fasta' -in = X"+matrixfile+"  -gapopen = "+str(go)+" -gapext = "+str(ge)+" -quiet -output fasta -outfile 'temp/tcoffee-out.fasta'"
+	os.system(command)
+	output = io.readFASTA("temp/tcoffee-out.fasta")
+	return output
