@@ -18,10 +18,8 @@ from types import *
 BIOALPHABET = list("ARNDCQEGHILKMFPSTWYVBZX")  # Protein alphabet
 
 # Create two random sequences from the protein alphabet
-seqA = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))]
-                for i in range(20)])
-seqB = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))]
-                for i in range(20)])
+seqA = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
+seqB = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 
 # Globally align them
 score, alignment_info = al.pairwiseBetweenSequences(
@@ -52,12 +50,6 @@ MSA = al.runMafftAlignmentWithSettings(
     sequences, 2, 1, method="globalpair", allowshift=False)
 print "Aligned sequences:"
 al.printMSA(MSA)
-#al.plotAlignment(MSA, "")
-al.plotAlignmentWithNaiveStability(MSA,"",labels=False)
-
-# Read MIDI file
-Notes, Durations, Onsets, minduration, PitchIntervals = io.readMIDIfile(
-    "AM-13A-2.mid")
 
 # Create a Krogh profile HMM from a folk tune family
 # First we need the emission probabilities gathered from the whole dataset

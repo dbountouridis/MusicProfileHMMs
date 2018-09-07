@@ -23,6 +23,9 @@ al.printMSA(alignment)
 
 ```
 
+The output should look something like this:
+![alt text](https://github.com/dbountouridis/MusicProfileHMMs/images/1.png "Alignment1")
+
 Add some random annotations on the original sequences and visualize them on the terminal:
 
 ```python
@@ -88,6 +91,8 @@ scores = [krogh.compareSequenceToProfHMM(model, query)[0] for query in querySequ
 labels = ["Daar_ging_een_heer_1.fasta" == filename for filename in queryIds]
 print "Average precision:", average_precision_score(labels, scores)
 ```
+
+
 
 ##### Citation
 If you use any part of the code, please cite the following publication:

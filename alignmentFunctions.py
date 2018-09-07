@@ -254,35 +254,34 @@ def pairwiseBetweenSequencesWithMatrix(seqA, seqB, gapopen=-0.8, gapext=-0.5, ma
 		param2 (): either the alignment or False
 
 	"""
+	maxscore = -1000000
+	if type_ == "global":
 
-    maxscore = -1000000
-    if type_ == "global":
+		if not returnAlignment:
+			return pairwise2.align.globalds(seqA, seqB, matrix, gapopen, gapext, score_only=True),False
+		else:
+			for a in pairwise2.align.globalds(seqA, seqB, matrix, gapopen, gapext, score_only=False):
+				score = a[2]
+				if score > maxscore:
+					winSeq = seqB
+					maxscore = score
+					winAli = a
+				break
+	return score,winAli
 
-    	if not returnAlignment:
-        	return pairwise2.align.globalds(seqA, seqB, matrix, gapopen, gapext, score_only=True),False
-        else:
-	        for a in pairwise2.align.globalds(seqA, seqB, matrix, gapopen, gapext, score_only=False):
-	            score = a[2]
-	            if score > maxscore:
-	                winSeq = seqB
-	                maxscore = score
-	                winAli = a
-	            break
-	        return score,winAli
+	if type_ == "local":
 
-    if type_ == "local":
-
-    	if not returnAlignment:
-        	return pairwise2.align.localdx(seqA, seqB, matrix, gapopen, gapext, score_only=True),False
-        else:
-	        for a in pairwise2.align.localdx(seqA, seqB, matrix, gapopen, gapext, score_only=False):
-	            score = a[2]
-	            if score > maxscore:
-	                winSeq = seqB
-	                maxscore = score
-	                winAli = a
-	            break
-	        return score,winAli
+		if not returnAlignment:
+			return pairwise2.align.localdx(seqA, seqB, matrix, gapopen, gapext, score_only=True),False
+		else:
+			for a in pairwise2.align.localdx(seqA, seqB, matrix, gapopen, gapext, score_only=False):
+				score = a[2]
+				if score > maxscore:
+					winSeq = seqB
+					maxscore = score
+					winAli = a
+				break
+		return score,winAli
 
  
 def pairwiseBetweenSequences(seqA, seqB, match=1, mismatch=-1, gapopen=-0.8, gapext=-0.5, type_="global", returnAlignment=False):
@@ -351,29 +350,29 @@ def printMSAwithMask(MSA,mask):
 	
 	"""
 
-    Alphabet=list("123456789")
+	Alphabet = list("123456789")
 
-    # Create the palette of possible foreground background combinations
-    col1=[("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
-    colors=col1
-    for i in range(0,len(col1)):
-        color1=col1[i][0]
-        for j in range(0,len(col1)):
-            color2=col1[j][0]
-            if color1!=color2:  colors.append((color1,"on_"+color2))
-            if len(colors)>=30: break
+	# Create the palette of possible foreground background combinations
+	col1 = [("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
+	colors = col1
+	for i in range(0,len(col1)):
+		color1 = col1[i][0]
+		for j in range(0,len(col1)):
+			color2 = col1[j][0]
+			if color1!=color2:  colors.append((color1,"on_"+color2))
+			if len(colors)>=30: break
 
-    # Assign color to symbols
-    for i,sequence in enumerate(MSA):
-        text=""
-        for j,c in enumerate(sequence):
-            if mask[i][j] not in Alphabet:
-                CL=(("grey",[]))
-            else:
-                CL=colors[Alphabet.index(mask[i][j])]
-            if len(CL[1])<1:text+=colored(c,CL[0])
-            else:text+=colored(c,CL[0],CL[1])
-        print text
+	# Assign color to symbols
+	for i,sequence in enumerate(MSA):
+		text = ""
+		for j,c in enumerate(sequence):
+			if mask[i][j] not in Alphabet:
+				CL = (("grey",[]))
+			else:
+				CL = colors[Alphabet.index(mask[i][j])]
+			if len(CL[1])<1:text+=colored(c,CL[0])
+			else: text+=colored(c,CL[0],CL[1])
+		print text
 
 
 def printMSA(MSA):
@@ -384,25 +383,25 @@ def printMSA(MSA):
 	
 	"""
 
-    Alphabet=list("-ARNDCQEGHILKMFPSTWYVBZX12345678*")
+	Alphabet = list("-ARNDCQEGHILKMFPSTWYVBZX12345678*")
 
-    # Create the palette of possible foreground background combinations
-    col1=[("grey",[]),("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
-    colors=col1
-    for i in range(0,len(col1)):
-        color1=col1[i][0]
-        for j in range(0,len(col1)):
-            color2=col1[j][0]
-            if color1!=color2:  colors.append((color1,"on_"+color2))
-            if len(colors)>=32: break
+	# Create the palette of possible foreground background combinations
+	col1 = [("grey",[]),("red",[]),("green",[]),("yellow",[]),("blue",[]),("magenta",[]),("cyan",[]),("white",[])]
+	colors = col1
+	for i in range(0,len(col1)):
+		color1 = col1[i][0]
+		for j in range(0,len(col1)):
+			color2 = col1[j][0]
+			if color1!=color2:  colors.append((color1,"on_"+color2))
+			if len(colors)>=32: break
 
-    for sequence in MSA:
-        text=""
-        for c in sequence :
-            CL=colors[Alphabet.index(c)]
-            if len(CL[1])<1:text+=colored(c,CL[0])
-            else:text+=colored(c,CL[0],CL[1])
-        print text
+	for sequence in MSA:
+		text = ""
+		for c in sequence :
+			CL = colors[Alphabet.index(c)]
+			if len(CL[1])<1:text+=colored(c,CL[0])
+			else:text+=colored(c,CL[0],CL[1])
+		print text
 
 
 def tcoffeeAlignment(sequences,go,ge):

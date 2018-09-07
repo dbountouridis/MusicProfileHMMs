@@ -146,9 +146,9 @@ def readTxtFile(file):
 
 def filesInPath(mypath,ext = []):
 	if len(ext) == 0:
-		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" ]
+		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f!= ".DS_Store" ]
 	else :
-		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f! = ".DS_Store" and f[-len(ext):] == ext]
+		onlyfiles = [ f for f in listdir(mypath) if isfile(join(mypath,f)) and f!= ".DS_Store" and f[-len(ext):] == ext]
 	return onlyfiles
 
 def dirsInPath(mypath):
