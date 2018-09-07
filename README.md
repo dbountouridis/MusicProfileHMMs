@@ -77,6 +77,18 @@ model.train([sequence for sequence in MSA], max_iterations=500, distribution_ine
 
 ```
 
+Finally, comprare sequences of a random family plus a sequence from the original MSA to the profile HMM:
+
+```python
+familyIndex = int(random.random()*len(files))
+querySequences = ["".join(seq).replace("-", "") for seq in io.readFASTA(directory+"/"+files[familyIndex])]+["".join(MSA[0])]
+queryIds = [files[familyIndex]] * (len(querySequences)-1)+["Daar_ging_een_heer_1.fasta"]
+
+scores = [krogh.compareSequenceToProfHMM(model, query)[0] for query in querySequences]
+labels = ["Daar_ging_een_heer_1.fasta" == filename for filename in queryIds]
+print "Average precision:", average_precision_score(labels, scores)
+```
+
 ##### Citation
 If you use any part of the code, please cite the following publication:
 
