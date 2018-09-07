@@ -57,6 +57,26 @@ EmissionProbabilities = dict( zip(alphabet, counts/np.sum(counts)))  # convert t
 
 ```
 
+Create a profile-HMM from the MSA:
+
+```python
+sw = 10
+pct = 1
+pec = 1/12.
+grms = 0.95
+model, columnsIsMatchState = krogh.profileHMM(MSA, alphabet=alphabet,gapRatiotoMatchStates=grms, pseudoCountTransition=pct,
+	sequenceWeight=sw, pseudoEmissionCount=pec, 
+	plot_=False, uniformInsertionProbs=True, nullEmission=EmissionProbabilities)
+
+# Train the profile HMM on the MSA to re-adjust the HMM parameters
+multiplication = 10
+di = 0.5
+ei = 0.5
+s_th = 0.000001
+model.train([sequence for sequence in MSA], max_iterations=500, distribution_inertia=di,edge_inertia=ei, stop_threshold=s_th, algorithm='baum-welocalh')
+
+```
+
 ##### Citation
 If you use any part of the code, please cite the following publication:
 
