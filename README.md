@@ -1,5 +1,5 @@
 # Modeling music variations with multiple sequence alignment and profile HMMs
-Python routines for data-driven analysis of unidimensional music sequences. Some of the functions include pairwise alignment (based on [BioPython](http://biopython.org/)), multiple sequence alignment (using [MAFFT](https://mafft.cbrc.jp/alignment/software/)) or progressive alignment with [T-COFFEE](http://www.tcoffee.org/)), substitution matrix creation from alignments (based on BioPython), consensus generation from an MSA (majority voting), profile HMM modelling of an MSA using Krogh's original model (1994) and HMMER.
+Python routines for data-driven analysis of unidimensional music sequences. Some of the functions include pairwise alignment (based on [BioPython](http://biopython.org/)), multiple sequence alignment (using [MAFFT](https://mafft.cbrc.jp/alignment/software/) or progressive alignment with [T-COFFEE](http://www.tcoffee.org/)), substitution matrix creation from alignments (based on BioPython), consensus generation from an MSA (majority voting), profile HMM modelling of an MSA using Krogh's original architecture (1994) and [HMMER](http://hmmer.org/) (modified for music sequences).
 
 ##### Example usage
 
