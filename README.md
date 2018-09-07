@@ -3,9 +3,11 @@ Python routines for data-driven analysis of unidimensional music sequences. Some
 
 ##### Example usage
 
-We start with a simple example of protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
+Before dealing with music sequences, we start with a simple example of aligning protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
 
 ```python
+BIOALPHABET = list("ARNDCQEGHILKMFPSTWYVBZX")
+
 seqA = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 seqB = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in range(20)])
 
@@ -14,15 +16,14 @@ seqB = "".join([BIOALPHABET[int(random.random()*len(BIOALPHABET))] for i in rang
 Globally pairwise align them and pretty-print them on the terminal:
 
 ```python
-score,alignment_info=al.pairwiseBetweenSequences(seqA, seqB, match=1, mismatch=-1, gapopen=-0.8, gapext=-0.5, type_="global", returnAlignment=True)
+score, alignment_info = al.pairwiseBetweenSequences(seqA, seqB, match=1, mismatch=-1, gapopen=-0.8, gapext=-0.5, type_="global", returnAlignment=True)
 
 alignment = [alignment_info[0], alignment_info[1]]
 al.printMSA(alignment)
-print "Alignment score:",score
 
 ```
 
-Now, let's add some annotations on the original sequences and visualize them on the terminal:
+Add some annotations on the original sequences and visualize them on the terminal:
 
 ```python
 LABELS = list("-12")
@@ -31,16 +32,12 @@ maskB = "".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
 al.printMSAwithMask([seqA,seqB], [maskA,maskB])
 ```
 
-We now focus on melodic sequences. We willl generate a multiple sequence alignment using MAFFT from a clique of melodic variations (melodies of the same tune family):
+We now focus on melodic sequences. We willl generate a multiple sequence alignment using MAFFT from a clique of melodic variations (melodies of the same [MTC](http://www.liederenbank.nl/mtc/) tune family). The melodies have already been converted into alphabetic sequences of pitch intervals:
 
 ```python
 sequences, ids = io.readFASTAandIDs("NotAligned/NLBproperSmall/Daar_ging_een_heer_1.fasta")
 
-#ensure the sequences are of the same length first by adding gaps in the end
-al.printMSA(al.makeSameLength(sequences)) 
-
-MSA=al.runMafftAlignmentWithSettings(sequences,2,1,method="globalpair",allowshift=False)
-print "Aligned sequences:"
+MSA = al.runMafftAlignmentWithSettings(sequences, 2, 1, method="globalpair", allowshift=False)
 al.printMSA(MSA)
 
 ```
