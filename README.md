@@ -24,7 +24,7 @@ al.printMSA(alignment)
 ```
 
 The output should look something like this:
-![alt text](https://github.com/dbountouridis/MusicProfileHMMs/images/1.png "Alignment1")
+![alt text](https://github.com/dbountouridis/MusicProfileHMMs/blob/master/images/1.png "Alignment1")
 
 Add some random annotations on the original sequences and visualize them on the terminal:
 
