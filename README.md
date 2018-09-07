@@ -3,7 +3,7 @@ Python routines for data-driven analysis of unidimensional music sequences. Some
 
 ##### Example usage
 
-Before dealing with music sequences, we start with a simple example of aligning protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
+We will go through the _demo.py_ script to get a glimpse of the routines' functionalities. Before dealing with music sequences, we start with a simple example of aligning protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
 
 ```python
 BIOALPHABET = list("ARNDCQEGHILKMFPSTWYVBZX")
@@ -23,7 +23,7 @@ al.printMSA(alignment)
 
 ```
 
-Add some annotations on the original sequences and visualize them on the terminal:
+Add some random annotations on the original sequences and visualize them on the terminal:
 
 ```python
 LABELS = list("-12")
@@ -32,7 +32,7 @@ maskB = "".join([LABELS[int(random.random()*len(LABELS))] for i in range(20)])
 al.printMSAwithMask([seqA,seqB], [maskA,maskB])
 ```
 
-We now focus on melodic sequences. We willl generate a multiple sequence alignment using MAFFT from a clique of melodic variations (melodies of the same [MTC](http://www.liederenbank.nl/mtc/) tune family). The melodies have already been converted into alphabetic sequences of pitch intervals:
+We now focus on the more interesting stuff, melodic sequences. We willl generate a multiple sequence alignment using MAFFT from a clique of melodic variations (melodies of the same [MTC](http://www.liederenbank.nl/mtc/) tune family). The melodies have already been converted into alphabetic sequences of pitch intervals:
 
 ```python
 sequences, ids = io.readFASTAandIDs("NotAligned/NLBproperSmall/Daar_ging_een_heer_1.fasta")
