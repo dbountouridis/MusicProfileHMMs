@@ -42,6 +42,21 @@ al.printMSA(MSA)
 
 ```
 
+The next step is to model the multiple sequene alignment using a profile HMM. But first we need to compute the global frequency of the symbols (pitch intervals) in the MTC dataset:
+
+```python
+directory = "NotAligned/NLBproperSmall"
+files = io.filesInPath(directory)
+
+allPossibleSymbols = "".join(["".join(["".join(seq) for seq in io.readFASTA(directory+"/"+file)]) for file in files]).replace("-", "")
+counts = collections.Counter(allPossibleSymbols)  
+alphabet = [symbol for symbol in counts]  
+counts = np.array([counts[symbol] for symbol in counts])  
+
+EmissionProbabilities = dict( zip(alphabet, counts/np.sum(counts)))  # convert to dictionary
+
+```
+
 ##### Citation
 If you use any part of the code, please cite the following publication:
 
