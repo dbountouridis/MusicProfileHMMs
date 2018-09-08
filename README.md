@@ -25,7 +25,7 @@ al.printMSA(alignment)
 
 The output should look something like this:
 
-![alt text](https://github.com/dbountouridis/MusicProfileHMMs/blob/master/images/1a.png "Alignment1" | width=100)
+![alt text](https://github.com/dbountouridis/MusicProfileHMMs/blob/master/images/1a.png "Alignment1"){:height="50%" width="50%"}
 
 Add some random annotations on the original sequences and visualize them on the terminal:
 
@@ -48,7 +48,7 @@ al.printMSA(MSA)
 
 The output should look something like this:
 
-![alt text](https://github.com/dbountouridis/MusicProfileHMMs/blob/master/images/4a.png "Alignment3" | width=300)
+![alt text](https://github.com/dbountouridis/MusicProfileHMMs/blob/master/images/4a.png "Alignment3"){:height="50%" width="50%"}
 
 The next step is to model the multiple sequene alignment using a profile HMM. But first we need to compute the global frequency of the symbols (pitch intervals) in the MTC dataset:
 
