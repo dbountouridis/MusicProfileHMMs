@@ -1,7 +1,7 @@
 # Modeling music variations with multiple sequence alignment and profile HMMs
 Python routines for data-driven analysis of unidimensional music sequences. Some of the functions include pairwise alignment (based on [BioPython](http://biopython.org/)), multiple sequence alignment (using [MAFFT](https://mafft.cbrc.jp/alignment/software/) or progressive alignment with [T-COFFEE](http://www.tcoffee.org/)), substitution matrix creation from alignments (based on BioPython), consensus generation from an MSA (majority voting), profile HMM modelling of an MSA using Krogh's original architecture (1994) and [HMMER](http://hmmer.org/) (modified for music sequences).
 
-##### Example usage
+### Example usage
 
 We will go through the _demo.py_ script to get a glimpse of the routines' functionalities. Before dealing with music sequences, we start with a simple example of aligning protein sequences. First, we create two random 20-symbol sequences from the protein alphabet:
 
@@ -100,7 +100,7 @@ print "Average precision:", average_precision_score(labels, scores)
 For modelling music variations using the HMMER architecture of profile-HMMs please email me at d.bountouridis@gmail.com. HMMER is generally faster but its accuracy is not much better than the Krogh architecture (for music sequences).
 
 
-##### Citation
+### Citation
 If you use any part of the code, please cite the following publication:
 
 Bountouridis, D., Brown, D.G., Wiering, F. and Veltkamp, R.C.	_Melodic Similarity and Applications Using Biologically-Inspired Techniques_. Appl. Sci. 2017, 7, 1242.
