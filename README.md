@@ -108,5 +108,5 @@ Bountouridis, D., Brown, D.G., Wiering, F. and Veltkamp, R.C.	_Melodic Similarit
 or 
 
 Bountouridis D. _Music Information Retrieval Using Biologically Inspired Techniques
-D_ PhD Thesis, Utrecht University, 2018.
+_ PhD Thesis, Utrecht University, 2018.
 
