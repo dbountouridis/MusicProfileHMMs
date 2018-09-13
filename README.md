@@ -105,3 +105,8 @@ If you use any part of the code, please cite the following publication:
 
 Bountouridis, D., Brown, D.G., Wiering, F. and Veltkamp, R.C.	_Melodic Similarity and Applications Using Biologically-Inspired Techniques_. Appl. Sci. 2017, 7, 1242.
 
+or 
+
+Bountouridis D. _Music Information Retrieval Using Biologically Inspired Techniques
+D_ PhD Thesis, Utrecht University, 2018.
+
