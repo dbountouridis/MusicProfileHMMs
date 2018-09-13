@@ -81,7 +81,7 @@ multiplication = 10
 di = 0.5
 ei = 0.5
 s_th = 0.000001
-model.train([sequence for sequence in MSA], max_iterations=500, distribution_inertia=di,edge_inertia=ei, stop_threshold=s_th, algorithm='baum-welocalh')
+model.train([sequence for sequence in MSA], max_iterations = 500, distribution_inertia = di,edge_inertia = ei, stop_threshold = s_th, algorithm = 'baum-welocalh')
 
 ```
 
@@ -97,6 +97,7 @@ labels = ["Daar_ging_een_heer_1.fasta" == filename for filename in queryIds]
 print "Average precision:", average_precision_score(labels, scores)
 ```
 
+For modelling music variations using the HMMER architecture of profile-HMMs please email me at d.bountouridis@gmail.com. HMMER is generally faster but its accuracy is not much better than the Krogh architecture (for music sequences).
 
 
 ##### Citation

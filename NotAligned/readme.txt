@@ -1,0 +1,1 @@
+This folder contains two datasets of melodic variations (grouped in cliques) converted into an alphabetic representation of pitch intervals. The CSVproperSmall corresponds to the Cover Song Variation dataset (https://dspace.library.uu.nl/handle/1874/303794) and the NLBproperSmall corresponds to the MTC dataset (http://www.liederenbank.nl/mtc/)
